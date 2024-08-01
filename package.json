@@ -1,0 +1,22 @@
+{
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "pg": "^8.12.0",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.37.3",
+    "sequelize-auto-migrations": "^1.0.3"
+  },
+  "devDependencies": {
+    "sequelize-cli": "^6.6.2"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "name": "express-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
