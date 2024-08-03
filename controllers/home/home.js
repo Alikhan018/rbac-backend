@@ -1,11 +1,11 @@
-const User = require("../../models/user");
+const db = require("../../models");
 
 class Home {
   constructor() {}
   static async loginAuth(req, res) {
     const { email, password } = req.body;
     try {
-      const user = await User.findOne({ where: { email: email } });
+      const user = await db.User.findOne({ where: { email: email } });
       if (user) {
         if (user.password === password) {
           res.json({
