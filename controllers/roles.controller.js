@@ -1,4 +1,4 @@
-const db = require("../../models");
+const db = require("../models");
 
 class RolesController {
   constructor() {}
@@ -50,26 +50,70 @@ class RolesController {
     }
   }
   static async createRole(req, res) {
-    const { name, features } = req.body;
+    const { name, groups, users, features } = req.body;
     try {
       const role = await db.Role.create({ name });
-      const featureCollection = features.map(async (feature) => {
-        await db.Feature.findOne({
-          where: {
-            [db.Sequelize.and]: [
-              { entityType: feature.entityType },
-              { name: feature.name },
-            ],
-          },
-        });
-      });
-      featureCollection.map(async (feature) => {
-        await db.FeaturePerms.create({
-          entityId: role.dataValues.id,
-          featureId: feature.id,
-          entityName: "Roles",
-        });
-      });
+      if (groups && groups.length > 0) {
+        const groupsCollection = await Promise.all(
+          groups.map(async (group) => {
+            await db.Group.findOne({
+              where: {
+                id: group.id,
+              },
+            });
+          })
+        );
+        await Promise.all(
+          groupsCollection.map(async (group) => {
+            await db.RoleGroup.create({
+              groupId: group.id,
+              roleId: role.dataValues.id,
+            });
+          })
+        );
+      }
+      if (users && users.length > 0) {
+        const usersCollection = await Promise.all(
+          users.map(async (user) => {
+            return await db.User.findOne({
+              where: {
+                id: user.id,
+              },
+            });
+          })
+        );
+        await Promise.all(
+          usersCollection.map(async (user) => {
+            await db.UserRole.create({
+              userId: user.id,
+              roleId: role.dataValues.id,
+            });
+          })
+        );
+      }
+      if (features && features.length > 0) {
+        const featureCollection = await Promise.all(
+          features.map(async (feature) => {
+            await db.Feature.findOne({
+              where: {
+                [db.Sequelize.and]: [
+                  { entityType: feature.entityType },
+                  { name: feature.name },
+                ],
+              },
+            });
+          })
+        );
+        await Promise.all(
+          featureCollection.map(async (feature) => {
+            await db.FeaturePerms.create({
+              entityId: role.dataValues.id,
+              featureId: feature.id,
+              entityName: "Roles",
+            });
+          })
+        );
+      }
       res.json({
         status: "success",
       });
@@ -131,7 +175,7 @@ class RolesController {
   static async deleteRole(req, res) {
     const { roleId } = req.params;
     try {
-      await db.FeaturePerms.destroy({
+      const featureperms = await db.FeaturePerms.findOne({
         where: {
           [db.Sequelize.Op.and]: [
             { entityId: roleId },
@@ -139,8 +183,19 @@ class RolesController {
           ],
         },
       });
-      await db.UserRole.destroy({ where: { roleId: roleId } });
-      await db.RoleGroup.destroy({ where: { roleId: roleId } });
+      if (featureperms)
+        await db.FeaturePerms.destroy({
+          where: {
+            [db.Sequelize.Op.and]: [
+              { entityId: roleId },
+              { entityName: "Roles" },
+            ],
+          },
+        });
+      const userrole = await db.UserRole.findOne({ where: { roleId } });
+      if (userrole) await db.UserRole.destroy({ where: { roleId: roleId } });
+      const rolegroup = await db.RoleGroup.findOne({ where: { roleId } });
+      if (rolegroup) await db.RoleGroup.destroy({ where: { roleId: roleId } });
       await db.Role.destroy({
         where: { id: roleId },
       });

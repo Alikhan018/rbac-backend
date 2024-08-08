@@ -1,4 +1,4 @@
-const db = require("../../models");
+const db = require("../models");
 
 class UserController {
   constructor() {}
@@ -55,24 +55,26 @@ class UserController {
         email,
         password,
       });
-      if (roles.length > 0) {
-        roles.map(
-          async (role) =>
-            await db.UserRole.create({
-              userId: user.dataValues.id,
-              roleId: role.id,
-            })
-        );
-      }
-      if (groups.length > 0) {
-        groups.map(
-          async (group) =>
-            await db.UserGroup.create({
-              userId: user.dataValues.id,
-              groupId: group.id,
-            })
-        );
-      }
+      if (roles)
+        if (roles.length > 0) {
+          roles.map(
+            async (role) =>
+              await db.UserRole.create({
+                userId: user.dataValues.id,
+                roleId: role.id,
+              })
+          );
+        }
+      if (groups)
+        if (groups.length > 0) {
+          groups.map(
+            async (group) =>
+              await db.UserGroup.create({
+                userId: user.dataValues.id,
+                groupId: group.id,
+              })
+          );
+        }
       res.json({
         status: "success",
         message: "user created!",
@@ -140,22 +142,35 @@ class UserController {
   static async deleteUser(req, res) {
     const userId = req.params.userId;
     try {
-      await db.FeaturePerms.destroy({
-        where: {
-          [db.Sequelize.and]: [{ entityId: userId }, { entityName: "Users" }],
-        },
+      const featurePerms = await db.FeaturePerms.findOne({
+        where: { entityId: userId, entityName: "Users" },
       });
-      await db.UserRole.destroy({ where: { userId: userId } });
-      await db.UserGroup.destroy({ where: { userId: userId } });
+      if (featurePerms) {
+        await db.FeaturePerms.destroy({
+          where: {
+            entityId: userId,
+            entityName: "Users",
+          },
+        });
+      }
+      const userRole = await db.UserRole.findOne({ where: { userId } });
+      if (userRole) {
+        await db.UserRole.destroy({ where: { userId } });
+      }
+      const userGroup = await db.UserGroup.findOne({ where: { userId } });
+      if (userGroup) {
+        await db.UserGroup.destroy({ where: { userId } });
+      }
       await db.User.destroy({ where: { id: userId } });
+
       res.json({
         status: "success",
-        message: "user destroyed",
+        message: "User destroyed",
       });
     } catch (err) {
       res.json({
         status: "error",
-        message: err,
+        message: err.message,
       });
     }
   }

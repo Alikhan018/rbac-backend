@@ -1,9 +1,9 @@
 const express = require("express");
 const cors = require("cors");
-const Home = require("./routes/home/homeroute");
-const Users = require("./routes/users/usersroutes");
-const Roles = require("./routes/roles/rolesroutes");
-const Groups = require("./routes/groups/groupsroutes");
+const Home = require("./routes/home.routes");
+const Users = require("./routes/users.routes");
+const Roles = require("./routes/roles.routes");
+const Groups = require("./routes/groups.routes");
 
 class Server {
   constructor() {
@@ -12,7 +12,7 @@ class Server {
     this.host = "localhost";
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(express.json());
-    this.app.use(cors())
+    this.app.use(cors());
     this.start();
     this.routes();
   }

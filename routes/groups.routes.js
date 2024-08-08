@@ -1,5 +1,5 @@
 const express = require("express");
-const Controller = require("../../controllers/groupsController/groupscontroller");
+const Controller = require("../controllers/groups.controller");
 
 class GroupRoutes {
   constructor() {
@@ -10,8 +10,8 @@ class GroupRoutes {
     this.router.get(`/`, Controller.getAll);
     this.router.get(`/:groupId`, Controller.getGroup);
     this.router.post(`/create`, Controller.createGroup);
-    this.router.put(`/:groupsId/update`, Controller.updateGroup);
-    this.router.delete(`/:groupsId/delete`, Controller.deleteGroup);
+    this.router.put(`/:groupId/update`, Controller.updateGroup);
+    this.router.delete(`/:groupId/delete`, Controller.deleteGroup);
   }
 }
 

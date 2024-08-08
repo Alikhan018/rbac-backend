@@ -1,5 +1,5 @@
 const express = require("express");
-const Controller = require("../../controllers/rolesController/rolesController");
+const Controller = require("../controllers/roles.controller");
 
 class RolesRouter {
   constructor() {
