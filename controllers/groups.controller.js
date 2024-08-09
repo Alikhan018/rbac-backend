@@ -131,41 +131,57 @@ class GroupController {
 
   static async updateGroup(req, res) {
     const id = req.params.groupId;
-    const { name, features } = req.body;
+    const { name, users, roles, features } = req.body;
     try {
-      await db.Group.update(name, {
-        where: {
-          id: id,
-        },
-      });
-      const featureCollection = await Promise.all(
-        features.map(async (feature) => {
-          return await db.Feature.findOne({
-            where: {
-              [db.Sequelize.Op.and]: [
-                { entityType: feature.entityType },
-                { name: feature.name },
-              ],
-            },
-          });
-        })
+      await db.Group.update(
+        { name },
+        {
+          where: {
+            id: id,
+          },
+        }
       );
-      if (!featureCollection || featureCollection[0] === null) {
-        throw { message: "No feature found!" };
+      if (roles) {
+        await db.RoleGroup.destroy({ where: { groupId: id } });
+        await Promise.all(
+          roles.map(
+            async (role) =>
+              await db.RoleGroup.create({
+                groupId: id,
+                roleId: role.id,
+              })
+          )
+        );
+      } else {
       }
-      await db.FeaturePerms.destroy({
-        where: {
-          entityId: id,
-          entityName: "Groups",
-        },
-      });
-      featureCollection.map(async (feature) => {
-        await db.FeaturePerms.upsert({
-          entityId: id,
-          featureId: feature.id,
-          entityName: "Groups",
+      if (users) {
+        await db.UserGroup.destroy({ where: { groupId: id } });
+        await Promise.all(
+          users.map(
+            async (user) =>
+              await db.UserGroup.create({
+                userId: user.id,
+                groupId: id,
+              })
+          )
+        );
+      } else {
+      }
+      if (features) {
+        await db.FeaturePerms.destroy({
+          where: {
+            entityId: id,
+            entityName: "Groups",
+          },
         });
-      });
+        await features.map(async (feature) => {
+          await db.FeaturePerms.create({
+            entityId: id,
+            featureId: feature.id,
+            entityName: "Groups",
+          });
+        });
+      }
       res.json({
         status: "success",
       });

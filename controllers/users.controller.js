@@ -91,28 +91,29 @@ class UserController {
     const userId = req.params.userId;
     const { email, roles, groups } = req.body;
     try {
-      const user = await db.User.update(email, {
-        where: { id: userId },
-      });
-      if (roles.length === 0) {
+      await db.User.update(
+        { email },
+        {
+          where: { id: userId },
+        }
+      );
+      if (roles) {
         await db.UserRole.destroy({ where: { userId: userId } });
-      } else if (roles.length > 0) {
         roles.map(
           async (role) =>
-            await db.UserRole.upsert({
-              userId: user.dataValues.id,
+            await db.UserRole.create({
+              userId,
               roleId: role.id,
             })
         );
       } else {
       }
-      if (groups.length === 0) {
+      if (groups) {
         await db.UserGroup.destroy({ where: { userId: userId } });
-      } else if (groups.length > 0) {
         groups.map(
           async (group) =>
-            await db.UserGroup.upsert({
-              userId: user.dataValues.id,
+            await db.UserGroup.create({
+              userId,
               groupId: group.id,
             })
         );
