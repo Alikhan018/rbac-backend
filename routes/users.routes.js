@@ -8,6 +8,7 @@ class UsersRouter {
   }
   routes() {
     this.router.get(`/`, Controller.getAll);
+    this.router.get(`/count`, Controller.countUser);
     this.router.get(`/:userId`, Controller.getUser);
     this.router.post(`/create`, Controller.createUser);
     this.router.put(`/:userId/update`, Controller.updateUser);

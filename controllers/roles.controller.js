@@ -226,6 +226,13 @@ class RolesController {
       });
     }
   }
+  static async countRoles(req, res) {
+    const count = await db.sequelize.query(
+      'SELECT CAST(COUNT(*) AS INTEGER) FROM "Roles"',
+      { type: db.sequelize.QueryTypes.SELECT }
+    );
+    res.json({ count });
+  }
 }
 
 module.exports = RolesController;

@@ -226,6 +226,13 @@ class GroupController {
       });
     }
   }
+  static async countGroups(req, res) {
+    const count = await db.sequelize.query(
+      'SELECT CAST(COUNT(*) AS INTEGER) FROM "Groups"',
+      { type: db.sequelize.QueryTypes.SELECT }
+    );
+    res.json({ count });
+  }
 }
 
 module.exports = GroupController;

@@ -8,6 +8,7 @@ class GroupRoutes {
   }
   routes() {
     this.router.get(`/`, Controller.getAll);
+    this.router.get(`/count`, Controller.countGroups);
     this.router.get(`/:groupId`, Controller.getGroup);
     this.router.post(`/create`, Controller.createGroup);
     this.router.put(`/:groupId/update`, Controller.updateGroup);

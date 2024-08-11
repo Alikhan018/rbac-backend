@@ -2,6 +2,7 @@ const db = require("../models");
 
 class UserController {
   constructor() {}
+
   static async getAll(req, res) {
     try {
       const users = await db.User.findAll({ order: [["id", "ASC"]] });
@@ -20,7 +21,7 @@ class UserController {
     const userId = req.params.userId;
     try {
       const user = await db.User.findOne({
-        where: { id: userId },
+        where: { id: parseInt(userId) },
         include: [
           {
             model: db.Role,
@@ -41,7 +42,6 @@ class UserController {
         data: user,
       });
     } catch (err) {
-      console.log(err);
       res.json({
         status: "error",
         message: err,
@@ -60,8 +60,8 @@ class UserController {
           roles.map(
             async (role) =>
               await db.UserRole.create({
-                userId: user.dataValues.id,
-                roleId: role.id,
+                userId: parseInt(user.dataValues.id),
+                roleId: parseInt(role.id),
               })
           );
         }
@@ -70,8 +70,8 @@ class UserController {
           groups.map(
             async (group) =>
               await db.UserGroup.create({
-                userId: user.dataValues.id,
-                groupId: group.id,
+                userId: parseInt(user.dataValues.id),
+                groupId: parseInt(group.id),
               })
           );
         }
@@ -80,7 +80,6 @@ class UserController {
         message: "user created!",
       });
     } catch (err) {
-      console.log(err);
       res.json({
         status: "error",
         message: err,
@@ -88,7 +87,7 @@ class UserController {
     }
   }
   static async updateUser(req, res) {
-    const userId = req.params.userId;
+    const userId = parseInt(req.params.userId);
     const { email, roles, groups } = req.body;
     try {
       await db.User.update(
@@ -141,7 +140,7 @@ class UserController {
     }
   }
   static async deleteUser(req, res) {
-    const userId = req.params.userId;
+    const userId = parseInt(req.params.userId);
     try {
       const featurePerms = await db.FeaturePerms.findOne({
         where: { entityId: userId, entityName: "Users" },
@@ -174,6 +173,14 @@ class UserController {
         message: err.message,
       });
     }
+  }
+
+  static async countUser(req, res) {
+    const count = await db.sequelize.query(
+      'SELECT CAST(COUNT(*) AS INTEGER) FROM "Users"',
+      { type: db.sequelize.QueryTypes.SELECT }
+    );
+    res.json({ count });
   }
 }
 

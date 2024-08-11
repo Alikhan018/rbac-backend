@@ -8,6 +8,7 @@ class RolesRouter {
   }
   routes() {
     this.router.get(`/`, Controller.getAll);
+    this.router.get(`/count`, Controller.countRoles);
     this.router.get(`/:roleId`, Controller.getRole);
     this.router.post(`/create`, Controller.createRole);
     this.router.put(`/:roleId/update`, Controller.updateRole);
