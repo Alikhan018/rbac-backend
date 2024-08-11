@@ -4,7 +4,7 @@ class GroupController {
   constructor() {}
   static async getAll(req, res) {
     try {
-      const groups = await db.Group.findAll({ order: [["id", "ASC"]] });
+      const groups = await db.Group.findAll({ order: [["name", "ASC"]] });
       res.json({
         status: "success",
         data: groups,

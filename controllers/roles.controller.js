@@ -4,7 +4,7 @@ class RolesController {
   constructor() {}
   static async getAll(req, res) {
     try {
-      const roles = await db.Role.findAll();
+      const roles = await db.Role.findAll({ order: [["name", "ASC"]] });
       res.json({
         status: "success",
         data: roles,
@@ -19,7 +19,6 @@ class RolesController {
   static async getRole(req, res) {
     const id = req.params.roleId;
     try {
-      console.log(id);
       const role = await db.Role.findOne({
         where: { id: id },
         include: [

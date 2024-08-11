@@ -5,7 +5,7 @@ class UserController {
 
   static async getAll(req, res) {
     try {
-      const users = await db.User.findAll({ order: [["id", "ASC"]] });
+      const users = await db.User.findAll({ order: [["email", "ASC"]] });
       res.json({
         status: "success",
         data: users,
