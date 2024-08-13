@@ -1,4 +1,5 @@
 const db = require("../models");
+const bcrypt = require("bcrypt");
 
 class UserController {
   constructor() {}
@@ -51,9 +52,10 @@ class UserController {
   static async createUser(req, res) {
     const { email, password, roles, groups } = req.body;
     try {
+      const hash = bcrypt.hashSync(password, 10);
       const user = await db.User.create({
         email,
-        password,
+        password: hash,
       });
       if (roles)
         if (roles.length > 0) {
@@ -133,7 +135,8 @@ class UserController {
     const id = req.params.userId;
     const { newPassword } = req.body;
     try {
-      await db.User.update({ password: newPassword }, { where: { id: id } });
+      const hash = bcrypt.hashSync(password, 10);
+      await db.User.update({ password: hash }, { where: { id: id } });
       res.json({ status: "success", message: "password changed!" });
     } catch (err) {
       res.json({ status: "error", message: err.message });

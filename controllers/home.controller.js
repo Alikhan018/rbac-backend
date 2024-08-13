@@ -1,4 +1,7 @@
 const db = require("../models");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const secretKey = "key4login";
 
 class Home {
   constructor() {}
@@ -7,9 +10,15 @@ class Home {
     try {
       const user = await db.User.findOne({ where: { email: email } });
       if (user) {
-        if (user.password === password) {
+        if (bcrypt.compare(password, user.password)) {
+          const refinedFromUser = {
+            id: user.dataValues.id,
+            email: user.dataValues.email,
+          };  
+          const token = jwt.sign({ refinedFromUser }, secretKey);
           res.json({
             message: "logged in",
+            token,
           });
         } else {
           res.json({ message: "password is wrong" });
