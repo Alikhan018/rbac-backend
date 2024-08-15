@@ -10,11 +10,11 @@ class Home {
     try {
       const user = await db.User.findOne({ where: { email: email } });
       if (user) {
-        if (bcrypt.compare(password, user.password)) {
+        if (await bcrypt.compare(password, user.password)) {
           const refinedFromUser = {
             id: user.dataValues.id,
             email: user.dataValues.email,
-          };  
+          };
           const token = jwt.sign({ refinedFromUser }, secretKey);
           res.json({
             message: "logged in",

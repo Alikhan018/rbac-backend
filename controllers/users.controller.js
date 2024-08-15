@@ -27,10 +27,22 @@ class UserController {
           {
             model: db.Role,
             as: "roles",
+            include: [
+              {
+                model: db.Feature,
+                as: "features",
+              },
+            ],
           },
           {
             model: db.Group,
             as: "groups",
+            include: [
+              {
+                model: db.Feature,
+                as: "features",
+              },
+            ],
           },
           {
             model: db.Feature,

@@ -7,7 +7,7 @@ class Role extends Model {
       through: models.FeaturePerms,
       foreignKey: "entityId",
       constraints: false,
-      as: "feature",
+      as: "features",
     });
     Role.belongsToMany(models.User, {
       through: models.UserRole,
